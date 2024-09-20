@@ -3,14 +3,15 @@ let stopFlag = false;
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "startApplying") {
         const { courseName, courseId } = request;
-
+        // console.log(courseId)
+        // console.log(courseName)
         async function applyForCourse() {
             stopFlag = false;
             let [tab] = await chrome.tabs.query({
                 active: true,
                 currentWindow: true
             });
-            console.log(tab.id);
+            // console.log(tab.id);
             const [results] = await chrome.scripting.executeScript({
                 target: {tabId: tab.id},
                 func: function (courseName, courseId) {
@@ -37,12 +38,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     return false;
                 },
                 args: [courseName, courseId],
-            }).then(() => console.log("script injected"));
+            });
 
             if (results.result) {
                 stopFlag = true; // Set the flag to true if the course was registered
             } else {
-                // console.log(results);
                 chrome.tabs.reload(tab.id); // Refresh the page
             }
         }
